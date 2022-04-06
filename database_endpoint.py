@@ -116,10 +116,10 @@ def trade():
 def order_book():
     #Your code here
     #Note that you can access the database session using g.session
-    database = []
+    data = []
     for order in g.session.query(Order).all():
-        attachData(order, database)
-    return jsonify(data=database)
+        attachData(order, data)
+    return jsonify(data=data)
 
 if __name__ == '__main__':
     app.run(port='5002')
