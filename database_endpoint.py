@@ -36,8 +36,8 @@ def log_message(d)
     g.session.add(Log(logtime=datetime.now(), message=json.dumps(d)))
     g.session.commit()
 
-def attachData(order, database):
-    database.append({
+def attachData(order, data):
+    data.append({
         'sender_pk': order.sender_pk,
         'receiver_pk': order.receiver_pk,
         'buy_currency': order.buy_currency,
@@ -91,8 +91,7 @@ def trade():
         if platform == 'Algorand':
             if algosdk.util.verify_bytes(payload.encode('utf-8'), signature, sender_public_key):
          
-                g.session.add(Order(sender_pk=sender_public_key, receiver_pk=receiver_public_key,
-                              buy_currency=buy_currency, sell_currency=sell_currency, buy_amount=buy_amount, sell_amount=sell_amount, signature=signature))
+                g.session.add(Order(sender_pk=sender_public_key, receiver_pk=receiver_public_key,buy_currency=buy_currency, sell_currency=sell_currency, buy_amount=buy_amount, sell_amount=sell_amount, signature=signature))
                 g.session.commit()
                 return jsonify(True)
             else:
@@ -100,12 +99,11 @@ def trade():
                 return jsonify(False)
 
         elif platform == 'Ethereum':
-            eth_encoded_msg = eth_account.messages.encode_defunct(text=payload)
+            eth_encoded = eth_account.messages.encode_defunct(text=payload)
 
-            if eth_account.Account.recover_message(eth_encoded_msg, signature=signature) == sender_public_key:
+            if eth_account.Account.recover_message(eth_encoded, signature=signature) == sender_public_key:
                 
-                g.session.add(Order(sender_pk=sender_public_key, receiver_pk=receiver_public_key,
-                              buy_currency=buy_currency, sell_currency=sell_currency, buy_amount=buy_amount, sell_amount=sell_amount, signature=signature))
+                g.session.add(Order(sender_pk=sender_public_key, receiver_pk=receiver_public_key,buy_currency=buy_currency, sell_currency=sell_currency, buy_amount=buy_amount, sell_amount=sell_amount, signature=signature))
                 g.session.commit()
                 return jsonify(True)
             else:
